@@ -1,16 +1,16 @@
 use crate::player::*;
-use crate::computer::*;
+use crate::human::*;
 
-pub struct HumanPlayer {
+pub struct ComputerPlayer {
     pub name: String,
     hidden_card: i32,
     visible_cards_sum: i32,
     passed: bool,
 }
 
-impl HumanPlayer {
+impl ComputerPlayer {
     pub fn new(n: &str) -> Self {
-        HumanPlayer {
+        ComputerPlayer {
             name: String::from(n),
             hidden_card: 0,
             visible_cards_sum: 0,
@@ -18,19 +18,26 @@ impl HumanPlayer {
         }
     }
 
-    fn show_cards(&self,
-        cp1: &ComputerPlayer,
-        cp2: &ComputerPlayer,
-        cp3: &ComputerPlayer) {
-        crate::show_score!(self.name, self.get_sum_of_visible_cards());
-        crate::show_score!(cp1.name, cp1.get_sum_of_visible_cards());
-        crate::show_score!(cp2.name, cp2.get_sum_of_visible_cards());
-        crate::show_score!(cp3.name, cp3.get_sum_of_visible_cards());
+    fn pick_or_pass(&self, p1: i32, p2: i32, p3: i32) -> bool {
+        let score = self.get_score();
+        if score < 15 {
+            return true
+        } else if score >= 18 {
+            return false
+        }
+
+        if score >= 15 && score < 19 {
+            if p1 + self.get_hidden_card() >= score 
+            || p2 + self.get_hidden_card() >= score 
+            || p3 + self.get_hidden_card() >= score {
+                return true
+            }
+        }
+        false
     }
 }
 
-
-impl Player for HumanPlayer {
+impl Player for ComputerPlayer {
     fn take_hidden_card(&mut self, card: i32) {
         self.hidden_card = card;
         println!("{}: takes the hidden card ({})", self.name, card);
@@ -49,15 +56,15 @@ impl Player for HumanPlayer {
         self.visible_cards_sum
     }
 
-    fn offer_card(&mut self, _: &HumanPlayer,
+
+    fn offer_card(&mut self, human: &HumanPlayer,
         cp1: &ComputerPlayer,
         cp2: &ComputerPlayer,
-        cp3: &ComputerPlayer) -> bool {
-        self.show_cards(cp1, cp2, cp3);
-        
-        let resp = get_yes_or_no("Take another card?");
+        _: &ComputerPlayer) -> bool {
+        let resp = self.pick_or_pass(human.get_score(),
+                            cp1.get_score(),
+                            cp2.get_score());
         if !resp { self.passed = resp }
         resp
     }
 }
-

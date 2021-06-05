@@ -1,8 +1,9 @@
 mod human;
+mod computer;
+mod player;
 use human::HumanPlayer;
 
-fn main() {
-    println!("Hello, world!");
 
+fn main() {
     let mut human = HumanPlayer::new("Beka");
 }
