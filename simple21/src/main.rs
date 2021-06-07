@@ -1,9 +1,9 @@
+mod game;
 mod human;
-mod computer;
 mod player;
-use human::HumanPlayer;
+mod computer;
 
 
 fn main() {
-    let mut human = HumanPlayer::new("Beka");
+    game::run();
 }
