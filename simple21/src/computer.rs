@@ -3,8 +3,8 @@ use crate::human::*;
 
 pub struct ComputerPlayer {
     pub name: String,
-    hidden_card: i32,
-    visible_cards_sum: i32,
+    hidden_card: u8,
+    visible_cards_sum: u8,
     passed: bool,
 }
 
@@ -18,7 +18,7 @@ impl ComputerPlayer {
         }
     }
 
-    fn pick_or_pass(&self, p1: i32, p2: i32, p3: i32) -> bool {
+    fn pick_or_pass(&self, p1: u8, p2: u8, p3: u8) -> bool {
         let score = self.get_score();
         if score < 15 {
             return true
@@ -38,21 +38,21 @@ impl ComputerPlayer {
 }
 
 impl Player for ComputerPlayer {
-    fn take_hidden_card(&mut self, card: i32) {
+    fn take_hidden_card(&mut self, card: u8) {
         self.hidden_card = card;
         println!("{}: takes the hidden card ({})", self.name, card);
     }
 
-    fn take_visible_card(&mut self, card: i32) {
+    fn take_visible_card(&mut self, card: u8) {
         self.visible_cards_sum = card;
         println!("{}: takes a card {}", self.name, card);
     }
 
-    fn get_hidden_card(&self) -> i32 {
+    fn get_hidden_card(&self) -> u8 {
         self.hidden_card
     }
 
-    fn get_sum_of_visible_cards(&self) -> i32 {
+    fn get_sum_of_visible_cards(&self) -> u8 {
         self.visible_cards_sum
     }
 

@@ -11,12 +11,12 @@ macro_rules! show_score {
 pub trait Player {
 
     // fn offer_card(h1: Player, cp1: )
-    fn take_hidden_card(&mut self, card: i32);
-    fn take_visible_card(&mut self, card: i32);
-    fn get_sum_of_visible_cards(&self) -> i32;
-    fn get_hidden_card(&self) -> i32;
+    fn take_hidden_card(&mut self, card: u8);
+    fn take_visible_card(&mut self, card: u8);
+    fn get_sum_of_visible_cards(&self) -> u8;
+    fn get_hidden_card(&self) -> u8;
 
-    fn get_score(&self) -> i32 {
+    fn get_score(&self) -> u8 {
         self.get_hidden_card() + self.get_sum_of_visible_cards()
     }
 

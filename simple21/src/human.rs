@@ -3,8 +3,8 @@ use crate::computer::*;
 
 pub struct HumanPlayer {
     pub name: String,
-    hidden_card: i32,
-    visible_cards_sum: i32,
+    hidden_card: u8,
+    visible_cards_sum: u8,
     passed: bool,
 }
 
@@ -31,21 +31,21 @@ impl HumanPlayer {
 
 
 impl Player for HumanPlayer {
-    fn take_hidden_card(&mut self, card: i32) {
+    fn take_hidden_card(&mut self, card: u8) {
         self.hidden_card = card;
         println!("{}: takes the hidden card ({})", self.name, card);
     }
 
-    fn take_visible_card(&mut self, card: i32) {
+    fn take_visible_card(&mut self, card: u8) {
         self.visible_cards_sum = card;
         println!("{}: takes a card {}", self.name, card);
     }
 
-    fn get_hidden_card(&self) -> i32 {
+    fn get_hidden_card(&self) -> u8 {
         self.hidden_card
     }
 
-    fn get_sum_of_visible_cards(&self) -> i32 {
+    fn get_sum_of_visible_cards(&self) -> u8 {
         self.visible_cards_sum
     }
 

@@ -5,5 +5,5 @@ mod computer;
 
 
 fn main() {
-    game::run();
+    game::run_game();
 }
