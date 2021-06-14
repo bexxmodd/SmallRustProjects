@@ -4,7 +4,7 @@ pub trait AbsoluteValue {
     fn abs_val(self) -> Self;
 }
 
-pub trait CommonValues {
+pub trait CommonValue {
     fn greatest_common_factor(x: Self, y: Self) -> Self;
     fn least_common_multiple(x: Self, y: Self) -> Self;
 }
@@ -16,7 +16,7 @@ impl AbsoluteValue for i32 {
     }
 }
 
-impl CommonValues for i32 {
+impl CommonValue for i32 {
     fn greatest_common_factor(x: i32, y: i32) -> i32 {
         let highest =
             if x.abs_val() > y.abs_val() { x.abs_val() }
@@ -135,36 +135,39 @@ impl Fraction {
 
 }
 
-pub fn avg_of_fractions(list: &Vec<Fraction>) -> Fraction {
-    if list.len() == 0 {
-        return Fraction::new(0, 1)
-    } else if list.len() == 1 {
-        return list[0].clone()
-    };
-
-    let mut f = list[0].clone();
-    for i in 1..list.len() {
-        f.add(&list[i]);
-    }
-
-    f.set_denominator(f.denominator * list.len() as i32);
-    f.reduce_form();
-    f
+pub trait FractionAverages {
+    fn avg_of_fractions(list: &Vec<Fraction>) -> Fraction;
+    fn avg_of_ints(arr: &[i32]) -> Fraction;
 }
 
-pub fn avg_of_ints(arr: &[i32]) -> Fraction {
-    if arr.len() == 0 {
-        return Fraction::new(0, 1)
-    };
+impl FractionAverages for Fraction {
+    fn avg_of_fractions(list: &Vec<Fraction>) -> Fraction {
+        if list.len() == 0 {
+            return Fraction::new(0, 1)
+        } else if list.len() == 1 {
+            return list[0].clone()
+        };
 
-    let mut total = 0;
-    for i in arr {
-        total += *i;
+        let mut f = list[0].clone();
+        for i in 1..list.len() { f.add(&list[i]); }
+
+        f.set_denominator(f.denominator * list.len() as i32);
+        f.reduce_form();
+        f
     }
 
-    let mut f = Fraction::new(total, arr.len() as i32);
-    f.reduce_form();
-    f
+    fn avg_of_ints(arr: &[i32]) -> Fraction {
+        if arr.len() == 0 {
+            return Fraction::new(0, 1)
+        };
+
+        let mut total = 0;
+        for i in arr { total += *i; }
+
+        let mut f = Fraction::new(total, arr.len() as i32);
+        f.reduce_form();
+        f
+    }
 }
 
 
@@ -273,12 +276,12 @@ mod tests {
         let flist = vec![Fraction::new(1, 3),
                                         Fraction::new(1, 3),
                                         Fraction::new(1, 3)];
-        assert_eq!(Fraction::new(1, 9), avg_of_fractions(&flist));
+        assert_eq!(Fraction::new(1, 9), Fraction::avg_of_fractions(&flist));
     }
 
     #[test]
     fn test_avg_arr() {
         let arr = [4, 1, 5, 6, 7];
-        assert_eq!(Fraction::new(23, 5), avg_of_ints(&arr));
+        assert_eq!(Fraction::new(23, 5), Fraction::avg_of_ints(&arr));
     }
 }
