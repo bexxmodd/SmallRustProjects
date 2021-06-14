@@ -36,7 +36,7 @@ impl CommonValues for i32 {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Fraction {
     numerator: i32,
     denominator: i32,
@@ -128,6 +128,43 @@ impl Fraction {
         f.reduce_form();
         f
     }
+
+    pub fn set_denominator(&mut self, d: i32) {
+        self.denominator = d;
+    }
+
+}
+
+pub fn avg_of_fractions(list: &Vec<Fraction>) -> Fraction {
+    if list.len() == 0 {
+        return Fraction::new(0, 1)
+    } else if list.len() == 1 {
+        return list[0].clone()
+    };
+
+    let mut f = list[0].clone();
+    for i in 1..list.len() {
+        f.add(&list[i]);
+    }
+
+    f.set_denominator(f.denominator * list.len() as i32);
+    f.reduce_form();
+    f
+}
+
+pub fn avg_of_ints(arr: &[i32]) -> Fraction {
+    if arr.len() == 0 {
+        return Fraction::new(0, 1)
+    };
+
+    let mut total = 0;
+    for i in arr {
+        total += *i;
+    }
+
+    let mut f = Fraction::new(total, arr.len() as i32);
+    f.reduce_form();
+    f
 }
 
 
@@ -147,6 +184,13 @@ mod tests {
     fn create_integer_fraction() {
         let f = Fraction::new(5, 7);
         assert_eq!(5, f.numerator);
+        assert_eq!(7, f.denominator);
+    }
+
+    #[test]
+    fn create_negative_fraction() {
+        let f = Fraction::new(5, -7);
+        assert_eq!(-5, f.numerator);
         assert_eq!(7, f.denominator);
     }
 
@@ -219,9 +263,22 @@ mod tests {
 
     #[test]
     fn test_avg() {
-
         let f1 = &Fraction::new(3, 4)
                                         .avg(&Fraction::new(1, 2));
         assert_eq!(Fraction::new(5, 8), *f1);
+    }
+
+    #[test]
+    fn test_avg_list() {
+        let flist = vec![Fraction::new(1, 3),
+                                        Fraction::new(1, 3),
+                                        Fraction::new(1, 3)];
+        assert_eq!(Fraction::new(1, 9), avg_of_fractions(&flist));
+    }
+
+    #[test]
+    fn test_avg_arr() {
+        let arr = [4, 1, 5, 6, 7];
+        assert_eq!(Fraction::new(23, 5), avg_of_ints(&arr));
     }
 }
