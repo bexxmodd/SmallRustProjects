@@ -18,8 +18,7 @@ pub fn greatest_common_factor(&self, x: i32, y: i32) -> i32 {
     let mut highest =
         if x.abs() > y.abs() { x.abs(); }
         else { y.abs(); };
-
-    for i in highest..
+    // TODO: finish function
 }
 
 
