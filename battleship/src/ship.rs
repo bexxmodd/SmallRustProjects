@@ -1,6 +1,6 @@
 
-#[derive(Debug)]
-struct Ship {
+#[derive(Debug, Clone)]
+pub struct Ship {
     bow_row: Option<u32>,
     bow_col: Option<u32>,
     length: usize,
@@ -64,40 +64,88 @@ impl Ship {
     }
 
     pub fn is_sunk(&self) -> bool {
-        self.hit.iter().all(|h| h == &true)
+        self.hit.iter().all(|h| *h == true)
     }
 
 }
 
-struct Submarine { }
+trait Placement {
+    fn length(&self) -> u32;
+    fn check_horizontal(&self, row: u32, column: u32,
+                        ships: &Vec<Vec<Ship>>) -> bool {
+        let mut start_row = row;
+        let mut lines_to_check = 1;
+
+        if row > 0 {
+            start_row -= 1;
+            lines_to_check += 1;
+        }
+
+        if row < 9 {
+            lines_to_check += 1;
+        }
+
+        let mut start_column = column;
+        let mut columns_to_check = self.length();
+
+        if column > 9 {
+            start_column += 1;
+            columns_to_check += 1;
+        }
+        if column >= self.length() {
+            columns_to_check += 1;
+        }
+
+        for r in 0..lines_to_check {
+            for c in start_column..(start_column-columns_to_check) {
+                if !ships[start_row as usize][c as usize].get_ship_type()
+                                                        .eq("Empty".to_String()) {
+                    return false;
+                }
+            }
+            start_row += 1;
+        }
+        return true;
+    }
+}
+
+pub struct Submarine { }
 
 impl Submarine {
-    fn create() -> Ship {
+    pub fn create() -> Ship {
         Ship::new(1)
     }
 }
 
-struct Destroyer { }
+pub struct Destroyer { }
 
 impl Destroyer {
-    fn create() -> Ship {
+    pub fn create() -> Ship {
         Ship::new(2)
     }
 }
 
-struct Cruiser { }
+pub struct Cruiser { }
 
 impl Cruiser {
-    fn create() -> Ship {
+    pub fn create() -> Ship {
         Ship::new(3)
     }
 }
 
-struct Battleship { }
+pub struct Battleship { }
 
 impl Battleship {
-    fn create() -> Ship {
+    pub fn create() -> Ship {
         Ship::new(4)
+    }
+}
+
+pub struct Empty { }
+
+impl Empty {
+    pub fn create() -> Ship {
+        Ship::new(0)
     }
 }
 
@@ -109,13 +157,15 @@ impl ShipType for Ship {
 
     fn get_ship_type(&self) -> String {
         if self.length == 1 {
-            return "Submarine".to_string()
+            "Submarine".to_string()
         } else if self.length == 2 {
-            return "Destroyer".to_string()
+            "Destroyer".to_string()
         } else if self.length == 3 {
-            return "Cruiser".to_string()
+            "Cruiser".to_string()
+        } else if self.length == 4 {
+            "Battleship".to_string()
         } else {
-            return "Battleship".to_string()
+            "-".to_string()
         }
     }
 }
