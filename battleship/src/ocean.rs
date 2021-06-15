@@ -29,4 +29,8 @@ impl Ocean {
             ship_sunk_count: 0,
         })
     }
+
+    pub fn get_ships(&self) -> &Vec<Vec<Ship>> {
+        &self.ships
+    }
 }

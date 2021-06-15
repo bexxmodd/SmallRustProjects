@@ -1,3 +1,4 @@
+use crate::ocean::*;
 
 #[derive(Debug, Clone)]
 pub struct Ship {
@@ -71,7 +72,25 @@ impl Ship {
 
 trait Placement {
     fn length(&self) -> u32;
-    fn check_horizontal(&self, row: u32, column: u32,
+
+    fn ok_to_place_at(&self, row: u32, column: u32,
+                    horizontal: bool, ocean: Ocean) -> bool {
+        if horizontal {
+            if row > 9 || column > 9 || column < self.length() + 1 {
+                return false
+            }
+        } else {
+            if row > 9 || row < self.length() + 1 || column > 9 {
+                return false
+            }
+        }
+
+        let mut ships = ocean.get_ships();
+
+        true
+    }
+
+    fn check_horizontal_placement(&self, row: u32, column: u32,
                         ships: &Vec<Vec<Ship>>) -> bool {
         let mut start_row = row;
         let mut lines_to_check = 1;
@@ -96,16 +115,50 @@ trait Placement {
             columns_to_check += 1;
         }
 
-        for r in 0..lines_to_check {
-            for c in start_column..(start_column-columns_to_check) {
+        for _ in 0..lines_to_check {
+            for c in ((start_column-columns_to_check)..=start_column).rev() {
                 if !ships[start_row as usize][c as usize].get_ship_type()
-                                                        .eq("Empty".to_String()) {
+                                                        .eq("Empty") {
                     return false;
                 }
             }
             start_row += 1;
         }
         return true;
+    }
+
+    fn check_vertical_placement(&self, row: u32, column: u32,
+                                ships: &Vec<Vec<Ship>>) -> bool {
+        let mut start_col = column;
+        let mut columns_to_check = 1;
+
+        if column < 9 {
+            start_col += 1;
+            columns_to_check += 1;
+        }
+
+        if column > 0 { columns_to_check += 1; }
+
+        let mut start_row = row;
+        let mut lines_to_check = self.length();
+
+        if row < 9 {
+            start_row += 1;
+            lines_to_check += 1;
+        }
+
+        if row >= self.length() { lines_to_check += 1; }
+
+        for _ in 0..columns_to_check {
+            for r in ((start_row-lines_to_check)..=start_row).rev() {
+                if !ships[r as usize][start_col as usize].get_ship_type()
+                                                        .eq("Empty") {
+                    return false;
+                }
+            }
+            start_col -= 1;
+        }
+        true
     }
 }
 
