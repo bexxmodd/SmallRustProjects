@@ -26,6 +26,39 @@ impl Ship {
         }
     }
 
+    pub fn place_ship(&mut self, row: u32, column: u32,
+        horizontal: bool, ocean: &mut Ocean) {
+        if self.ok_to_place_at(row, column, horizontal, ocean) {
+            self.bow_row = Some(row);
+            self.bow_col = Some(column);
+            self.horizontal = horizontal;
+            ocean.deploy_ship(self);
+        }
+    }
+
+    pub fn shoot_at(&mut self, row: usize, column: usize) -> bool {
+        if self.is_sunk() {
+            return false
+        }
+
+        let mut which_one = 0usize;
+        if self.is_horizontal() {
+            if let Some(col) = self.get_bow_col() {
+                for i in (col - self.length()..=col).rev() {
+                    if i as usize == column && self.bow_row.unwrap() as usize == row {
+                        self.hit[which_one] = true;
+                        return true;
+                    }
+                    which_one += 1;
+                }
+            } else {
+                return false
+            }
+        }
+
+        false
+    }
+
     pub fn get_length(&self) -> usize {
         self.length
     }
@@ -68,12 +101,13 @@ impl Ship {
 
 }
 
-trait Placement {
+pub trait Placement {
     fn length(&self) -> u32;
+
     fn is_horizontal(&self) -> bool;
 
     fn ok_to_place_at(&self, row: u32, column: u32,
-                    horizontal: bool, ocean: Ocean) -> bool {
+                    horizontal: bool, ocean: &Ocean) -> bool {
         if horizontal {
             if row > 9 || column > 9 || column < self.length() + 1 {
                 return false
