@@ -26,13 +26,15 @@ impl Ocean {
         if ship.is_horizontal() {
             let col_index = ship.get_bow_col().unwrap();
 
-            for i in (col_index-ship.length()..=col_index).rev() {
+            let curr = col_index - ship.length() as usize + 1;
+            for i in (curr..=col_index).rev() {
                 self.ships[ship.get_bow_row().unwrap() as usize][i as usize] = ship.clone();
             }
         } else {
             let row_index = ship.get_bow_row().unwrap();
 
-            for i in ((ship.length() - row_index)..=row_index).rev() {
+            let curr = ship.length() as usize - row_index + 1;
+            for i in (curr..=row_index).rev() {
                 self.ships[ship.get_bow_col().unwrap() as usize][i as usize] = ship.clone();
             }
         }
@@ -80,8 +82,8 @@ pub fn fill_ocean() -> Vec<Vec<Ship>> {
         let mut tmp = Vec::with_capacity(10);
         for j in 0..10 {
             let mut empty = Empty::create();
-            empty.set_bow_row(i as u32);
-            empty.set_bow_col(j as u32);
+            empty.set_bow_row(i);
+            empty.set_bow_col(j);
             tmp.push(empty);
         }
         ships.push(tmp);

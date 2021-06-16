@@ -4,14 +4,16 @@ use crate::ocean::*;
 
 #[derive(Debug, Clone)]
 pub struct Ship {
-    bow_row: Option<u32>,
-    bow_col: Option<u32>,
+    bow_row: Option<usize>,
+    bow_col: Option<usize>,
     length: usize,
     horizontal: bool,
     hit: Vec<bool>,
 }
 
 impl Ship {
+
+    /// Ship constructor
     fn new(length: usize) -> Self {
         if length > 4 {
             panic!("Ship length exceeds the maximum of 4 blocks");
@@ -26,7 +28,8 @@ impl Ship {
         }
     }
 
-    pub fn place_ship(&mut self, row: u32, column: u32,
+    /// Places ship at the given location
+    pub fn place_ship(&mut self, row: usize, column: usize,
         horizontal: bool, ocean: &mut Ocean) {
         if self.ok_to_place_at(row, column, horizontal, ocean) {
             self.bow_row = Some(row);
@@ -36,16 +39,18 @@ impl Ship {
         }
     }
 
+    /// If a part of the ship occupies the given row and column,
+    /// and it has not been sunk, mark it as a hit.
     pub fn shoot_at(&mut self, row: usize, column: usize) -> bool {
-        if self.is_sunk() {
-            return false
-        }
+        if self.is_sunk() { return false }
 
         let mut which_one = 0usize;
         if self.is_horizontal() {
             if let Some(col) = self.get_bow_col() {
-                for i in (col - self.length()..=col).rev() {
-                    if i as usize == column && self.bow_row.unwrap() as usize == row {
+                let curr = col - (self.length() as usize) + 1;
+
+                for i in (curr..=col).rev() {
+                    if i as usize == column && self.bow_row.unwrap() == row {
                         self.hit[which_one] = true;
                         return true;
                     }
@@ -54,8 +59,18 @@ impl Ship {
             } else {
                 return false
             }
-        }
+        } else {
+            if let Some(rw) = self.get_bow_row() {
+                let curr = rw - (self.length() as usize) + 1;
 
+                for i in (curr..=rw).rev() {
+                    if i == row && self.bow_col.unwrap() == column {
+                        self.hit[which_one] = true;
+                        return true
+                    }
+                }
+            }
+        }
         false
     }
 
@@ -63,7 +78,7 @@ impl Ship {
         self.length
     }
 
-    pub fn get_bow_row(&self) -> Option<u32> {
+    pub fn get_bow_row(&self) -> Option<usize> {
         if let Some(r) = self.bow_row {
             Some(r)
         } else {
@@ -71,7 +86,7 @@ impl Ship {
         }
     }
 
-    pub fn get_bow_col(&self) -> Option<u32> {
+    pub fn get_bow_col(&self) -> Option<usize> {
         if let Some(c) = self.bow_col {
             Some(c)
         } else {
@@ -83,11 +98,11 @@ impl Ship {
         &self.hit
     }
 
-    pub fn set_bow_row(&mut self, row: u32) {
+    pub fn set_bow_row(&mut self, row: usize) {
         self.bow_row = Some(row);
     }
 
-    pub fn set_bow_col(&mut self, col: u32) {
+    pub fn set_bow_col(&mut self, col: usize) {
         self.bow_col = Some(col);
     }
 
@@ -106,16 +121,12 @@ pub trait Placement {
 
     fn is_horizontal(&self) -> bool;
 
-    fn ok_to_place_at(&self, row: u32, column: u32,
+    fn ok_to_place_at(&self, row: usize, column: usize,
                     horizontal: bool, ocean: &Ocean) -> bool {
-        if horizontal {
-            if row > 9 || column > 9 || column < self.length() + 1 {
-                return false
-            }
-        } else {
-            if row > 9 || row < self.length() + 1 || column > 9 {
-                return false
-            }
+        if row > 9 || column > 9 ||
+            horizontal && (column as u32) < self.length() + 1 ||
+            (row as u32) < self.length() + 1 {
+            return false
         }
 
         let ships = ocean.get_ships();
@@ -127,7 +138,8 @@ pub trait Placement {
         }
     }
 
-    fn check_horizontal_placement(&self, row: u32, column: u32,
+    ///Checks if the Horizontal Ship can be placed on a Grid.
+    fn check_horizontal_placement(&self, row: usize, column: usize,
                         ships: &Vec<Vec<Ship>>) -> bool {
         let mut start_row = row;
         let mut lines_to_check = 1;
@@ -137,34 +149,35 @@ pub trait Placement {
             lines_to_check += 1;
         }
 
-        if row < 9 {
-            lines_to_check += 1;
-        }
+        if row < 9 { lines_to_check += 1; }
 
         let mut start_column = column;
         let mut columns_to_check = self.length();
 
-        if column > 9 {
+        if column < 9 {
             start_column += 1;
             columns_to_check += 1;
         }
-        if column >= self.length() {
+
+        if column >= (self.length() as usize) {
             columns_to_check += 1;
         }
 
         for _ in 0..lines_to_check {
-            for c in ((start_column-columns_to_check)..=start_column).rev() {
-                if !ships[start_row as usize][c as usize].get_ship_type()
-                                                        .eq("Empty") {
+            let curr = start_column + (columns_to_check as usize) + 1;
+            for c in (curr..=start_column).rev() {
+                if !ships[start_row][c].get_ship_type()
+                                        .eq("Empty") {
                     return false;
                 }
             }
             start_row += 1;
         }
-        return true;
+        true
     }
 
-    fn check_vertical_placement(&self, row: u32, column: u32,
+    ///Checks if the vertical Ship can be place on a given location
+    fn check_vertical_placement(&self, row: usize, column: usize,
                                 ships: &Vec<Vec<Ship>>) -> bool {
         let mut start_col = column;
         let mut columns_to_check = 1;
@@ -184,12 +197,13 @@ pub trait Placement {
             lines_to_check += 1;
         }
 
-        if row >= self.length() { lines_to_check += 1; }
+        if row >= (self.length() as usize) { lines_to_check += 1; }
 
         for _ in 0..columns_to_check {
-            for r in ((start_row-lines_to_check)..=start_row).rev() {
-                if !ships[r as usize][start_col as usize].get_ship_type()
-                                                        .eq("Empty") {
+            let curr = start_row - (lines_to_check as usize) + 1;
+            for r in (curr..=start_row).rev() {
+                if !ships[r][start_col].get_ship_type()
+                                        .eq("Empty") {
                     return false;
                 }
             }
@@ -328,5 +342,24 @@ mod test {
     fn test_ship_length() {
         let battle = Battleship::create();
         assert_eq!(4, battle.length());
+    }
+
+    #[test]
+    fn test_ship_placement() {
+        let mut destr = Destroyer::create();
+        let mut ocean = Ocean::new();
+        destr.place_ship(4, 3, true, &mut ocean);
+        assert!(!destr.is_sunk());
+        assert_eq!(4, destr.get_bow_row().unwrap());
+        assert_eq!(3, destr.get_bow_col().unwrap());
+    }
+
+    #[test]
+    fn test_shoot_at() {
+        let mut o = Submarine::create();
+        o.set_bow_row(4);
+        o.set_bow_col(3);
+        assert!(o.shoot_at(4, 3));
+        assert!(o.is_sunk());
     }
 }
