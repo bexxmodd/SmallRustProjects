@@ -170,9 +170,6 @@ impl FractionAverages for Fraction {
     }
 }
 
-
-
-
 #[cfg(test)]
 mod tests {
     use super::*;

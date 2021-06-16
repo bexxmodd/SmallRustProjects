@@ -1,7 +1,5 @@
 use crate::ship::*;
 
-use std::rc::Rc;
-
 #[derive(Debug)]
 pub struct Ocean {
     ships: Vec<Vec<Ship>>,
@@ -12,22 +10,28 @@ pub struct Ocean {
 }
 
 impl Ocean {
-    pub fn new() -> Box<Self> {
+    /// Creates an empty ocean filled with Empty and initializes give variable.
+    pub fn new() -> Self {
+        // Initialized the ships array with Empty as placeholder
         let mut tmp = Vec::with_capacity(10);
-        for _ in 0..10 {
+        for i in 0..10 {
             let mut s = Vec::with_capacity(10);
-            for _ in 0..10 {
-                s.push(Empty::create());
+            for j in 0..10 {
+                let mut empty = Empty::create();
+                empty.set_bow_row(i as u32);
+                empty.set_bow_col(j as u32);
+                s.push(empty);
             }
             tmp.push(s);
         }
-        Box::new(Ocean {
+
+        Ocean {
             ships: tmp,
             shots: [[false; 10]; 10],
             shots_fired_count: 0,
             shots_hit_count: 0,
             ship_sunk_count: 0,
-        })
+        }
     }
 
     pub fn get_ships(&self) -> &Vec<Vec<Ship>> {
