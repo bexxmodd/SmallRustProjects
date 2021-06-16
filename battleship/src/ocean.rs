@@ -1,12 +1,16 @@
+use rand::seq::SliceRandom;
+use rand::thread_rng;
+use rand::Rng;
+
 use crate::ship::*;
 
 #[derive(Debug)]
 pub struct Ocean {
-    ships: Vec<Vec<Ship>>,
-    shots: [[bool; 10]; 10],
-    shots_fired_count: u32,
-    shots_hit_count: u32,
-    ship_sunk_count: u32,
+    pub ships: Vec<Vec<Ship>>,
+    pub shots: [[bool; 10]; 10],
+    pub shots_fired_count: u32,
+    pub shots_hit_count: u32,
+    pub ship_sunk_count: u32,
 }
 
 impl Ocean {
@@ -36,6 +40,36 @@ impl Ocean {
             let curr = ship.length() as usize - row_index + 1;
             for i in (curr..=row_index).rev() {
                 self.ships[ship.get_bow_col().unwrap() as usize][i as usize] = ship.clone();
+            }
+        }
+    }
+
+    pub fn place_ships_randomly(&mut self) {
+        let mut ten_ships = build_ships();
+
+        // We get all possible sets with two elements and shuffle them
+        let mut xy_locs = cartesian_product(10);
+        let mut rng = thread_rng();
+        xy_locs.shuffle(&mut rng);
+
+        let mut ship_index = 0usize;
+
+        loop {
+            for loc in xy_locs.iter() {
+                if ship_index == 10 {
+                    return;
+                }
+
+                let mut ship = ten_ships.remove(ship_index);
+
+                let row = loc.0 as usize;
+                let column = loc.1 as usize;
+                let horizontal = rng.gen::<bool>();
+
+                if ship.ok_to_place_at(row, column, horizontal, self) {
+                    ship.place_ship(row, column, horizontal, self);
+                    ship_index += 1;
+                }
             }
         }
     }
@@ -72,6 +106,51 @@ impl Ocean {
             self.ship_sunk_count += 1;
         }
         hit
+    }
+}
+
+pub trait Printing {
+
+    ///Enumerates a column by printing integers in a single row
+    fn enumerate_columns(num: u32) {
+        println!("   ");
+        for i in 0..num {
+            print!(" {} ", i);
+        }
+        println!("");
+    }
+
+    ///Prints the Ocean grid which is used as a GUI to aid the user
+    fn print_grid(&self);
+
+    ///Prints current statistics of the game in this ocean.
+    fn print_stats(&self);
+}
+
+impl Printing for Ocean {
+    fn print_grid(&self) {
+        Ocean::enumerate_columns(10);
+
+        for i in 0..self.ships.len() {
+            print!(" {} ", i);
+
+            for j in 0..self.ships[i].len() {
+                if self.shots[i][j] {
+                    print!(" {} ", self.ships[i][j]);
+                } else {
+                    print!(" . ");
+                }
+                print!(" {} \n", i);
+            }
+        }
+        Ocean::enumerate_columns(10);
+    }
+
+    fn print_stats(&self) {
+        println!("Shots fired: {} | Shots Hit: {}",
+            self.shots_fired_count, self.shots_hit_count);
+        println!("Total Ships: 10 | Ships Sunk: {} | Ships Remaining: {}",
+            self.ship_sunk_count, 10 - self.ship_sunk_count);
     }
 }
 
