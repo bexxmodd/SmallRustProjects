@@ -1,3 +1,5 @@
+
+use std::fmt;
 use crate::ocean::*;
 
 #[derive(Debug, Clone)]
@@ -48,10 +50,6 @@ impl Ship {
         &self.hit
     }
 
-    pub fn is_horizontal(&self) -> bool {
-        return self.horizontal
-    }
-
     pub fn set_bow_row(&mut self, row: u32) {
         self.bow_row = Some(row);
     }
@@ -72,6 +70,7 @@ impl Ship {
 
 trait Placement {
     fn length(&self) -> u32;
+    fn is_horizontal(&self) -> bool;
 
     fn ok_to_place_at(&self, row: u32, column: u32,
                     horizontal: bool, ocean: Ocean) -> bool {
@@ -85,9 +84,13 @@ trait Placement {
             }
         }
 
-        let mut ships = ocean.get_ships();
+        let ships = ocean.get_ships();
 
-        true
+        if self.is_horizontal() {
+            self.check_horizontal_placement(row, column, ships)
+        } else {
+            self.check_vertical_placement(row, column, ships)
+        }
     }
 
     fn check_horizontal_placement(&self, row: u32, column: u32,
@@ -162,6 +165,16 @@ trait Placement {
     }
 }
 
+impl Placement for Ship {
+    fn length(&self) -> u32 {
+        self.length as u32
+    }
+
+    fn is_horizontal(&self) -> bool {
+        self.horizontal
+    }
+}
+
 pub struct Submarine { }
 
 impl Submarine {
@@ -202,33 +215,39 @@ impl Empty {
     }
 }
 
-trait ShipType {
+pub trait ShipType {
     fn get_ship_type(&self) -> String;
 }
 
 impl ShipType for Ship {
 
     fn get_ship_type(&self) -> String {
-        if self.length == 1 {
-            "Submarine".to_string()
-        } else if self.length == 2 {
-            "Destroyer".to_string()
-        } else if self.length == 3 {
-            "Cruiser".to_string()
-        } else if self.length == 4 {
-            "Battleship".to_string()
+        match self.length {
+            1 => "Submarine".to_string(),
+            2 => "Destroyer".to_string(),
+            3 => "Cruiser".to_string(),
+            4 => "Battleship".to_string(),
+            _ => "Empty".to_string()
+        }
+    }
+}
+
+impl fmt::Display for Ship {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.is_sunk() {
+            write!(f, "s")
         } else {
-            "-".to_string()
+            write!(f, "x")
         }
     }
 }
 
 
 #[cfg(test)]
-
 mod test {
     use super::*;
 
+    // Test generic Ship
     #[test]
     fn create_ship() {
         assert_eq!(1, Ship::new(1).get_length());
@@ -241,14 +260,39 @@ mod test {
     }
 
     #[test]
-    fn test_get_ship_type() {
-        let cruz = Cruiser::create();
-        assert_eq!("Cruiser", cruz.get_ship_type());
+    #[should_panic]
+    fn test_ship_length_with_5() {
+        let _ = Ship::new(5);
     }
 
     #[test]
     fn test_if_sunk() {
         let cruz = Cruiser::create();
         assert!(!cruz.is_sunk());
+    }
+
+    #[test]
+    fn test_get_ship_type() {
+        let cruz = Cruiser::create();
+        assert_eq!("Cruiser", cruz.get_ship_type());
+    }
+
+    #[test]
+    fn test_get_battleship() {
+        let battle = Battleship::create();
+        assert_eq!("Battleship", battle.get_ship_type());
+    }
+
+    #[test]
+    fn test_if_ship_horizontal() {
+        let mut dest = Destroyer::create();
+        dest.set_horizontal();
+        assert_eq!(true, dest.is_horizontal());
+    }
+    
+    #[test]
+    fn test_ship_length() {
+        let battle = Battleship::create();
+        assert_eq!(4, battle.length());
     }
 }

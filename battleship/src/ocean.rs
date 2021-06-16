@@ -38,3 +38,19 @@ impl Ocean {
         &self.ships
     }
 }
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn create_ocean_test() {
+        let ocean = Ocean::new();
+        let empty = ocean.get_ships();
+        assert_eq!("Empty", empty[0][0].get_ship_type());
+        assert_eq!("Empty", empty[9][9].get_ship_type());
+    }
+
+
+}
