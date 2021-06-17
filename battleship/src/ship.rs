@@ -45,7 +45,9 @@ impl Ship {
         if self.is_sunk() { return false }
 
         let mut which_one = 0usize;
+
         if self.is_horizontal() {
+
             if let Some(col) = self.get_bow_col() {
                 let curr = col - (self.length() as usize) + 1;
 
@@ -60,14 +62,16 @@ impl Ship {
                 return false
             }
         } else {
+            
             if let Some(rw) = self.get_bow_row() {
+                
                 let curr = rw - (self.length() as usize) + 1;
-
                 for i in (curr..=rw).rev() {
                     if i == row && self.bow_col.unwrap() == column {
                         self.hit[which_one] = true;
                         return true
                     }
+                    which_one += 1;
                 }
             }
         }
@@ -107,6 +111,7 @@ impl Ship {
     }
 
     pub fn is_sunk(&self) -> bool {
+        if self.length < 1 { return false }
         self.hit.iter().all(|h| *h == true)
     }
 
@@ -354,11 +359,17 @@ mod test {
 
     #[test]
     fn test_shoot_at() {
-        let mut o = Submarine::create();
-        o.set_bow_row(4);
-        o.set_bow_col(3);
-        assert!(o.shoot_at(4, 3));
-        assert!(o.is_sunk());
+        let mut b = Battleship::create();
+        b.set_bow_row(4);
+        b.set_bow_col(3);
+        assert!(b.shoot_at(4, 3));
+        assert!(!b.is_sunk());
+        assert!(b.shoot_at(3, 3));
+        assert!(b.shoot_at(2, 3));
+        assert!(!b.is_sunk());
+        assert!(b.shoot_at(1, 3));
+        assert!(!b.shoot_at(0, 3));
+        assert!(b.is_sunk());
     }
 
     #[test]

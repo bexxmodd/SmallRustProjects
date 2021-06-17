@@ -6,10 +6,10 @@ use std::io::{self, Write};
 use text_io::read;
 
 fn main() {
+    let mut ocean = Ocean::new();
+    ocean.place_ships_randomly();
 
     loop {
-        let mut ocean = Ocean::new();
-        ocean.place_ships_randomly();
 
         if game_over(&ocean) {
             println!("Congratulations! You've won the game!");
@@ -20,6 +20,7 @@ fn main() {
 
             if answer.starts_with("Y") {
                 ocean.clear_ocean();
+                ocean.place_ships_randomly();
                 continue;
             } else if answer.starts_with("N") {
                 return;
