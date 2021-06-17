@@ -74,10 +74,6 @@ impl Ship {
         false
     }
 
-    pub fn get_length(&self) -> usize {
-        self.length
-    }
-
     pub fn get_bow_row(&self) -> Option<usize> {
         if let Some(r) = self.bow_row {
             Some(r)
@@ -179,7 +175,7 @@ pub trait Placement {
     ///Checks if the vertical Ship can be place on a given location
     fn check_vertical_placement(&self, row: usize, column: usize,
                                 ships: &Vec<Vec<Ship>>) -> bool {
-        let mut start_col = column;
+        let mut start_col = column as i32;
         let mut columns_to_check = 1;
 
         if column < 9 {
@@ -189,8 +185,8 @@ pub trait Placement {
 
         if column > 0 { columns_to_check += 1; }
 
-        let mut start_row = row;
-        let mut lines_to_check = self.length();
+        let mut start_row = row as i32;
+        let mut lines_to_check = self.length() as i32;
 
         if row < 9 {
             start_row += 1;
@@ -200,9 +196,9 @@ pub trait Placement {
         if row >= (self.length() as usize) { lines_to_check += 1; }
 
         for _ in 0..columns_to_check {
-            let curr = start_row - (lines_to_check as usize) + 1;
+            let curr = start_row - lines_to_check + 1;
             for r in (curr..=start_row).rev() {
-                if !ships[r][start_col].get_ship_type()
+                if !ships[r as usize][start_col as usize].get_ship_type()
                                         .eq("Empty") {
                     return false;
                 }
@@ -282,7 +278,9 @@ impl ShipType for Ship {
 
 impl fmt::Display for Ship {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.is_sunk() {
+        if self.get_ship_type().eq("Empty") {
+            write!(f, "-")
+        } else if self.is_sunk() {
             write!(f, "s")
         } else {
             write!(f, "x")
@@ -298,13 +296,13 @@ mod test {
     // Test generic Ship
     #[test]
     fn create_ship() {
-        assert_eq!(1, Ship::new(1).get_length());
+        assert_eq!(1, Ship::new(1).length());
     }
 
     #[test]
     fn test_submarine() {
         let sub = Submarine::create();
-        assert_eq!(1, sub.get_length());
+        assert_eq!(1, sub.length());
     }
 
     #[test]
@@ -362,4 +360,15 @@ mod test {
         assert!(o.shoot_at(4, 3));
         assert!(o.is_sunk());
     }
+
+    #[test]
+    fn test_is_sunk() {
+        let mut d = Destroyer::create();
+        assert!(!d.is_sunk());
+        d.hit[0] = true;
+        assert!(!d.is_sunk());
+        d.hit[1] = true;
+        assert!(d.is_sunk())
+    }
+
 }

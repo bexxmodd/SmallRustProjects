@@ -37,7 +37,7 @@ impl Ocean {
         } else {
             let row_index = ship.get_bow_row().unwrap();
 
-            let curr = ship.length() as usize - row_index + 1;
+            let curr = row_index - ship.length() as usize + 1;
             for i in (curr..=row_index).rev() {
                 self.ships[ship.get_bow_col().unwrap() as usize][i as usize] = ship.clone();
             }
@@ -59,8 +59,7 @@ impl Ocean {
                 if ship_index == 10 {
                     return;
                 }
-
-                let mut ship = ten_ships.remove(ship_index);
+                let ship = ten_ships.get_mut(ship_index).unwrap();
 
                 let row = loc.0 as usize;
                 let column = loc.1 as usize;
@@ -107,13 +106,14 @@ impl Ocean {
         }
         hit
     }
+
 }
 
 pub trait Printing {
 
     ///Enumerates a column by printing integers in a single row
     fn enumerate_columns(num: u32) {
-        println!("   ");
+        print!("   ");
         for i in 0..num {
             print!(" {} ", i);
         }
@@ -134,14 +134,15 @@ impl Printing for Ocean {
         for i in 0..self.ships.len() {
             print!(" {} ", i);
 
-            for j in 0..self.ships[i].len() {
+            for j in 0..10 {
                 if self.shots[i][j] {
                     print!(" {} ", self.ships[i][j]);
                 } else {
                     print!(" . ");
                 }
-                print!(" {} \n", i);
             }
+            print!(" {} ", i);
+            println!("");
         }
         Ocean::enumerate_columns(10);
     }
@@ -195,6 +196,11 @@ pub fn cartesian_product(num: i32) -> Vec<(i32, i32)> {
         }
     }
     cart_set
+}
+
+///Checks if all the ships has sunk and game is finished.
+pub fn game_over(ocean: &Ocean) -> bool {
+    ocean.ship_sunk_count == 10
 }
 
 
