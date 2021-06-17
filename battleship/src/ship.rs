@@ -49,8 +49,8 @@ impl Ship {
         if self.is_horizontal() {
 
             if let Some(col) = self.get_bow_col() {
-                let curr = col - (self.length() as usize) + 1;
 
+                let curr = col - (self.length() as usize) + 1;
                 for i in (curr..=col).rev() {
                     if i as usize == column && self.bow_row.unwrap() == row {
                         self.hit[which_one] = true;
@@ -358,7 +358,7 @@ mod test {
     }
 
     #[test]
-    fn test_shoot_at() {
+    fn test_shoot_at_vertical() {
         let mut b = Battleship::create();
         b.set_bow_row(4);
         b.set_bow_col(3);
@@ -370,6 +370,20 @@ mod test {
         assert!(b.shoot_at(1, 3));
         assert!(!b.shoot_at(0, 3));
         assert!(b.is_sunk());
+    }
+
+    #[test]
+    fn test_shoot_at_horizontal() {
+        let mut cr = Cruiser::create();
+        cr.set_bow_row(5);
+        cr.set_bow_col(5);
+        cr.set_horizontal();
+        assert!(cr.shoot_at(5, 5));
+        assert!(!cr.is_sunk());
+        assert!(cr.shoot_at(5, 4));
+        assert!(cr.shoot_at(5, 3));
+        assert!(!cr.shoot_at(1, 3));
+        assert!(cr.is_sunk());
     }
 
     #[test]

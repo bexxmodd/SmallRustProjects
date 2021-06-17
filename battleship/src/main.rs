@@ -2,6 +2,7 @@ mod ship;
 mod ocean;
 
 use ocean::*;
+use ship::*;
 use std::io::{self, Write};
 use text_io::read;
 
@@ -44,7 +45,8 @@ fn main() {
         }
         
         ocean.print_grid();
+        let _ = io::stdout().flush();
         println!("-------------------------------------");
-        ocean.print_stats();        
+        ocean.print_stats();
     }
 }
