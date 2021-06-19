@@ -1,0 +1,1 @@
+{"rustc":18145874729619535536,"features":"[]","target":8511891774890910857,"profile":6415348288391478785,"path":1036222786711178230,"deps":[[14559970743024043887,"regex",false,11376475968423057195]],"local":[{"CheckDepInfo":{"dep_info":"debug/.fingerprint/hangman-bf7c2b3325a81fe0/dep-test-bin-hangman"}}],"rustflags":[],"metadata":10628224375503422086,"config":0,"compile_kind":0}

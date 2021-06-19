@@ -18,11 +18,13 @@ impl Iterator for Tokenizer {
         if let Some(s) = &mut self.current {
             let mut split: Vec<_> = s.split(' ').collect();
             let nxt = split.remove(0).to_string();
+
             if split.is_empty() {
                 self.current = None;
             } else {
                 self.current = Some(split.join(" "));
             }
+            
             if nxt.is_empty() {
                 None
             } else {
