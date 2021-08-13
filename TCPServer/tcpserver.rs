@@ -4,8 +4,10 @@ use std::io::{Read, Write};
 use std::env;
 use std::str;
 
+const BUFFERBYTES: usize = 20;
+
 fn client_handshake(mut stream: TcpStream) {
-    let mut data = [0 as u8; 20]; // using 20 byte buffer
+    let mut data = [0 as u8; BUFFERBYTES]; // using 20 byte buffer
 
     while match stream.read(&mut data) {
         Ok(size) => {
@@ -53,7 +55,6 @@ fn main() {
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
-                println!("New connection: {}", stream.peer_addr().unwrap());
                 thread::spawn(move || {
                     // connection succeeded
                     client_handshake(stream);
