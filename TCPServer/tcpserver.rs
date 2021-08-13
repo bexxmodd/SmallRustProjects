@@ -1,5 +1,5 @@
 use std::thread;
-use std::net::{TcpListener, TcpStream, Shutdown};
+use std::net::{TcpListener, TcpStream};
 use std::io::{Read, Write};
 use std::env;
 use std::str;
@@ -21,10 +21,8 @@ fn client_handshake(mut stream: TcpStream) {
             true
         },
         Err(_) => {
-            eprintln!("Ann error occurred, terminating connection with {}",
-                    stream.peer_addr().unwrap());
-                    stream.shutdown(Shutdown::Both).unwrap();
-                    false
+            eprintln!("An error occurred while connecting to socket");
+            false
         }
     } {}
 }
@@ -42,7 +40,6 @@ fn cycle_client_response(value: &str) -> String {
 }
 
 fn main() {
-    // create server on localhost
     let mut addr = String::from("127.0.0.1:");
 
     // read user input which should contain port
@@ -56,7 +53,7 @@ fn main() {
         match stream {
             Ok(stream) => {
                 thread::spawn(move || {
-                    // connection succeeded
+                    // handle successful connection
                     client_handshake(stream);
                 });
             }
