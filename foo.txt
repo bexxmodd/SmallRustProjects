@@ -1,0 +1,16 @@
+total 6760
+drwxrwxr-x  8 bexx bexx    4096 Jun 21 21:52 .
+drwxrwxrwx 34 bexx bexx    4096 Jun 19 22:08 ..
+drwxr-xr-x  5 bexx bexx    4096 Jun 16 21:51 battleship
+-rw-rw-r--  1 bexx bexx       0 Jun 21 21:52 foo.txt
+drwxr-xr-x  4 bexx bexx    4096 Jun 13 22:40 fractions
+drwxrwxr-x  8 bexx bexx    4096 Jun 18 22:29 .git
+-rw-rw-r--  1 bexx bexx     409 Jun 13 22:31 .gitignore
+drwxrwxr-x  4 bexx bexx    4096 Jun 18 15:44 hangman
+-rwxrwxr-x  1 bexx bexx 3400816 Jun  5 08:48 pig
+-rw-rw-r--  1 bexx bexx    4153 Jun  5 08:49 pig.rs
+-rw-rw-r--  1 bexx bexx      66 Jun  4 08:04 README.md
+-rwxrwxr-x  1 bexx bexx 3461776 Jun 21 21:52 redirect
+-rw-r--r--  1 bexx bexx     385 Jun 21 21:52 redirect.rs
+drwxrwxr-x  5 bexx bexx    4096 Jun  6 07:23 simple21
+drwxr-xr-x  4 bexx bexx    4096 Jun 13 09:17 tokenizer
