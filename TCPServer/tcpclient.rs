@@ -3,7 +3,16 @@ use std::io::{Read, Write};
 use std::str::from_utf8;
 use std::env;
 
-const BUFFERBYTES: u32 = 20;
+const BUFFER_BYTES: usize = 20;
+
+fn package_parser(data: &[u8], size: usize) -> i32 {
+    let val = from_utf8(&data[0..size]).unwrap();
+    let mut splits = val.split(' ');
+    splits.next();
+    let num = splits.next().unwrap()
+        .parse::<i32>().unwrap();
+    num
+}
 
 fn main() {
     // get host address, port number, and value to send from user input
@@ -21,22 +30,19 @@ fn main() {
             msg.push_str(&args[3]);
             stream.write(msg.as_bytes()).unwrap();
 
-            let mut data = [0 as u8; BUFFERBYTES]; // using 20 byte buffer
+            let mut data = [0 as u8; BUFFER_BYTES]; // using 20 byte buffer
             match stream.read(&mut data) {
                 Ok(size) => {
-                    let val = from_utf8(&data[0..size]).unwrap();
-                    let mut splits = val.split(' ');
-                    splits.next();
-                    let mut num = splits.next().unwrap()
-                                        .parse::<i32>().unwrap();
+                    // let mut splits = val.split(' ');
+                    let mut num = package_parser(&data, size);
 
                     if num - args[3].parse::<i32>().unwrap() == 1 {
-                        println!("{}", val);
+                        // println!("{}", val);
                         num += 1;
                         let resp = format!("Hello {}", num);
                         stream.write(resp.as_bytes()).unwrap();
                     } else {
-                        println!("Error: Unexpected reply of -> {}", val);
+                        println!("Error in data received: expected {}", num + 1);
                     }
                 },
                 Err(e) => eprintln!("Failed to receive data: {}", e),

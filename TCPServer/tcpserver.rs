@@ -4,10 +4,11 @@ use std::io::{Read, Write};
 use std::env;
 use std::str;
 
-const BUFFERBYTES: usize = 20;
+// We'll use 20 byte buffer
+const BUFFER_BYTES: usize = 20;
 
 fn client_handshake(mut stream: TcpStream) {
-    let mut data = [0 as u8; BUFFERBYTES]; // using 20 byte buffer
+    let mut data = [0 as u8; BUFFER_BYTES];
 
     while match stream.read(&mut data) {
         Ok(size) => {
@@ -20,8 +21,8 @@ fn client_handshake(mut stream: TcpStream) {
             }
             true
         },
-        Err(_) => {
-            eprintln!("An error occurred while connecting to socket");
+        Err(e) => {
+            eprintln!("An error: {}", e);
             false
         }
     } {}
@@ -31,7 +32,7 @@ fn cycle_client_response(value: &str) -> String {
     let mut splits = value.split(' ');
     splits.next();
 
-    // get number sent by client 
+    // get integer sent by client 
     let mut num = splits.next().unwrap()
                         .parse::<i32>().unwrap();
     num += 1;
@@ -42,13 +43,12 @@ fn cycle_client_response(value: &str) -> String {
 fn main() {
     let mut addr = String::from("127.0.0.1:");
 
-    // read user input which should contain port
+    // read user input which should contain port number
     let args: Vec<String> = env::args().collect();
     addr.push_str(&args[1]);
     let listener = TcpListener::bind(addr).unwrap();
 
-    // accept connections and process them,
-    // spawning a new thread for each connection
+    // accept connection, process it and spawn a new thread for it
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
