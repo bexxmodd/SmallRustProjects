@@ -14,7 +14,7 @@ if __name__ == '__main__':
     host = sys.argv[1]
     port = sys.argv[2]
     num_calls = int(sys.argv[3])
-    client_bin = './tcpclient'
+    client_bin = './threadtcpclient'
 
     for _ in range(num_calls):
         client_call(client_bin, host, port)
