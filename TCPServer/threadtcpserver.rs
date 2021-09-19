@@ -1,22 +1,23 @@
 // tcpserver.rs
+
 use std::thread;
 use std::net::{TcpListener, TcpStream};
 use std::io::{Read, Write};
 use std::env;
 use std::str;
 
-// We'll use 20 byte buffer for package
+// 20 byte buffer for package transfers
 const BUFFER_BYTES: usize = 20;
 
 fn client_handshake(mut stream: TcpStream) {
-    let mut data = [0 as u8; BUFFER_BYTES];
+    let mut data = [0u8; BUFFER_BYTES];
 
     while match stream.read(&mut data) {
         Ok(size) => {
-            // echo what's received
             if size > 0 {
                 let val = str::from_utf8(&data[0..size]).unwrap();
                 println!("{}", val);
+
                 let resp = cycle_client_response(val);
                 stream.write(resp.as_bytes()).unwrap();
             }
@@ -31,7 +32,7 @@ fn client_handshake(mut stream: TcpStream) {
 
 fn cycle_client_response(value: &str) -> String {
     let mut splits = value.split(' ');
-    splits.next();
+    splits.next(); // we're only interested in int value
 
     // get integer sent by client 
     let mut num = splits.next().unwrap()
@@ -44,9 +45,10 @@ fn cycle_client_response(value: &str) -> String {
 fn main() {
     let mut addr = String::from("127.0.0.1:");
 
-    // read user input which should contain port number
+    // read user input from terminal which should contain port number
     let args: Vec<String> = env::args().collect();
     addr.push_str(&args[1]);
+
     let listener = TcpListener::bind(addr).unwrap();
 
     // accept connection, process it and spawn a new thread for it
