@@ -47,17 +47,22 @@ pub struct Fraction {
     denominator: i32,
 }
 
+
 impl Fraction {
-    pub fn new(numerator: i32, denominator: i32) -> Self {
-        if denominator < 0 {
+    pub fn new<T: Into<i32>>(numerator: T, denominator: T) -> Self
+    where
+        T: Into<i32>, 
+    {
+        let d = denominator.into();
+        if d < 0 {
             Fraction {
-                numerator: numerator * -1,
-                denominator: denominator * -1,
+                numerator: numerator.into() * -1,
+                denominator: d * -1,
             }
         } else {
             Fraction {
-                numerator,
-                denominator,
+                numerator: numerator.into(),
+                denominator: d,
             }
         }
     }
@@ -134,6 +139,12 @@ impl Fraction {
     pub fn set_denominator(&mut self, d: i32) {
         self.denominator = d;
     }
+}
+
+impl From<Fraction> for f32 {
+   fn from(f: Fraction) -> Self {
+       f.numerator as f32 / f.denominator as f32
+   }
 }
 
 pub trait FractionAverages {
