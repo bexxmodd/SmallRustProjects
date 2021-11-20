@@ -80,15 +80,85 @@ where
     }
 }
 
+
+struct Appelation {
+    name: String,
+    nicknames: Vec<String>,
+}
+
+impl Drop for Appelation {
+    fn drop(&mut self) {
+        print!("Dropping {}", self.name);
+        if !self.nicknames.is_empty() {
+            print!(" (AKA {})", self.nicknames.join(", "));
+        }
+        println!("");
+    }
+}
+
+use std::ops::{Deref, DerefMut};
+use std::fmt::Display;
+
+struct Selector<T> {
+    elements: Vec<T>,
+    current: usize,
+}
+
+impl<T> Deref for Selector<T> {
+    type Target = T;
+
+    fn deref(&self) -> &T {
+        &self.elements[self.current]
+    }
+}
+
+impl<T> DerefMut for Selector<T> {
+    fn deref_mut(&mut self) -> &mut T {
+        &mut self.elements[self.current]
+    }
+}
+
+fn show_it_generic<T: Display>(thing: T) {
+    println!("{}", thing);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_deref() {
+        let mut s = Selector { elements: vec!['x', 'y', 'z'], current: 2 };
+        assert_eq!(*s, 'z');
+        assert!(s.is_alphabetic());
+
+        *s = 'w';
+        assert_eq!(s.elements, ['x', 'y', 'w']);
+
+        // force the coercion to convert from &T to &str
+        show_it_generic(&*s);
+        assert_eq!(*s, 'w');
+    }
 
     #[test]
     fn it_works() {
         let s = Triangle::new();
         let name = s.shape_name();
         assert_eq!("Shape ::> Triangle".to_string(), name);
+    }
+
+    #[test]
+    fn drop_works() {
+        let mut a = Appelation {
+            name: "Beka".to_string(),
+            nicknames: vec!["Bexx".to_string(),
+                            "Beshkina".to_string()]
+        };
+
+        println!("Before assignment");
+        a = Appelation { name: "Idk".to_string(), nicknames: vec![] };
+        println!("at the end of block");
+        assert_eq!(2, 2);
     }
 }
 
