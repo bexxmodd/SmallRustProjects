@@ -118,13 +118,65 @@ impl<T> DerefMut for Selector<T> {
     }
 }
 
+impl<T> Default for Selector<T> {
+    fn default() -> Self {
+        Selector { elements: vec![], current: 0, }
+    }
+}
+
+impl<T> Iterator for Selector<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        todo!()
+    }
+}
+
+// impl<T> IntoIterator for Selector<T> {
+//     type Item = T;
+//     type IntoIter = Selector<T>;
+// 
+//     fn into_iter(self) -> Self::IntoIter {
+//         Selector {
+//             elements: self,
+//             current: 0,
+//         }
+//     }
+// }
+// 
+// impl<T> Extend for Selector<T> {
+//     fn extend<T: IntoIterator<Item = A>>(&mut self, iter: T) {
+//         todo!()
+//     }
+// }
+
 fn show_it_generic<T: Display>(thing: T) {
     println!("{}", thing);
 }
 
+use std::collections::HashSet;
+
+fn split_numbers_into_two_sets(nums: &[i32]) -> (HashSet<i32>, HashSet<i32>) {
+    let (even, odd) = nums
+        .iter()
+        .partition(|&n| n % 2 == 0);
+    (even, odd)
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn split_numbers_test() {
+        let n = [4, 5, 7, 8, 12, 13, 20];
+        let (e, o) = split_numbers_into_two_sets(&n);
+        let res1: HashSet<i32> = [4, 8, 12, 20].iter().cloned().collect();
+        let res2: HashSet<i32> = [5, 7, 13].iter().cloned().collect();
+        assert_eq!(res1, e);
+        assert_eq!(res2, o);
+    }
 
     #[test]
     fn test_deref() {
