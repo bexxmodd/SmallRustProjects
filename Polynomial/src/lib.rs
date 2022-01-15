@@ -1,4 +1,5 @@
-use std::ops::{Neg, Add, Sub, Mul};
+#![feature(unboxed_closures, fn_traits)]
+use std::ops::{Neg, Add, Sub, Mul, Fn, FnOnce};
 
 #[derive(Debug, Clone)]
 struct Polynomial(Vec<(i32, i32)>);
@@ -59,6 +60,17 @@ impl Mul for Polynomial {
     }
 }
 
+impl FnOnce<(i32,)> for Polynomial {
+    type Output = i32;
+
+    extern "rust-call" fn call_once(self, args: (i32, )) -> Self::Output {
+        let x = args.0;
+        self.0.iter()
+            .map(|(i, j)| i * x.pow(*j as u32))
+            .sum()
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -83,12 +95,20 @@ mod tests {
             vec![(2, 1), (1, 0), (2, 1), (1, 0)]);
     }
 
+    #[test]
+    fn call_polynomial() {
+        let p = Polynomial(vec![(2, 1), (1, 0)]);
+        assert_eq!(3, p(1));
+    }
+
+    #[test]
     fn sub_polynomial() {
         assert_eq!((Polynomial(vec![(2, 1), (1, 0)]) 
             - Polynomial(vec![(2, 1), (1, 0)])).get_polynomial(),
             vec![(2, 1), (1, 0), (-2, 1), (-1, 0)]);
     }
 
+    #[test]
     fn mul_polynomial() {
         assert_eq!((Polynomial(vec![(2, 1), (1, 0)]) 
             * Polynomial(vec![(2, 1), (1, 0)])).get_polynomial(),
