@@ -163,7 +163,6 @@ fn split_numbers_into_two_sets(nums: &[i32]) -> (HashSet<i32>, HashSet<i32>) {
     (even, odd)
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
