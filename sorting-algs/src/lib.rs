@@ -1,15 +1,35 @@
 use std::fmt::Debug;
 
 pub trait Sorting {
-    type Item: PartialOrd + Debug + Clone;
+    fn insertion_sort(&mut self);
+    fn bubble_sort(&mut self);
+    fn merge_sort(&mut self);
+    fn quick_sort(&mut self);
+}
 
-    fn bubble_sort(arr: &mut [Self::Item]) {
-        let len = arr.len();
+impl<T> Sorting for [T]
+where 
+    T: PartialOrd + Debug + Clone
+{
+    fn insertion_sort(&mut self) {
+        for i in 1..self.len() {
+            let value = self[i].clone();
+            let mut hole = i;
+            while hole > 0 && self[hole - 1] > self[i] {
+                self[hole] = self[hole - 1].clone();
+                hole -= 1;
+            }
+            self[hole] = value;
+        }
+    }
+
+    fn bubble_sort(&mut self) {
+        let len = self.len();
         for i in 0..len {
             let mut sorted = true;
             for j in 0..(len - i - 1) {
-                if arr[j] > arr[j + 1] {
-                    arr.swap(j, j + 1);
+                if self[j] > self[j + 1] {
+                    self.swap(j, j + 1);
                     sorted = false;
                 }
             }
@@ -17,47 +37,13 @@ pub trait Sorting {
         }
     }
 
-    fn merge_sort(arr: &mut Vec<Self::Item>) {
-        let size = arr.len();
-        if size < 2 {
-            return
-        }
-
-        let mid: usize = size / 2;
-        let mut left = arr.split_off(mid);
-        <Self as Sorting>::merge_sort(&mut left);
-        <Self as Sorting>::merge_sort(arr);
-        <Self as Sorting>::__merge(&mut left, arr, size);
+    fn merge_sort(&mut self) {
+        todo!()
     }
 
-    fn __merge(left: &mut Vec<Self::Item>, src_as_right: &mut Vec<Self::Item>,
-        size: usize) {
-        let mut i = 0;
-        let mut j = 0;
-        let mut res = Vec::with_capacity(size);
-        while i < left.len() && j < src_as_right.len() {
-            if left[i] <= src_as_right[i] {
-                res.push(left[i].clone());
-                i += 1;
-            } else {
-                res.push(src_as_right[j].clone());
-                j += 1;
-            }
-        }
-        while i < left.len() {
-            res.push(left[i].clone());
-            i += 1;
-        }
-        while j < src_as_right.len() {
-            res.push(src_as_right[j].clone());
-            j += 1;
-        }
-        *src_as_right = res
+    fn quick_sort(&mut self) {
+        todo!()
     }
-}
-
-impl<T: PartialOrd + Debug + Clone> Sorting for Vec<T> {
-    type Item = T;
 }
 
 #[cfg(test)]
@@ -67,14 +53,14 @@ mod tests {
     #[test]
     fn bubble_sort_short() {
         let mut v = vec![3, 2, 4, 1];
-        <Vec<i32> as Sorting>::bubble_sort(&mut v);
+        v.bubble_sort();
         assert_eq!(v, vec![1, 2, 3, 4]);
     }
 
     #[test]
     fn merge_sort() {
         let mut v = vec![3, 2, 4, 1];
-        <Vec<i32> as Sorting>::merge_sort(&mut v);
+        v.merge_sort();
         assert_eq!(v, vec![1, 2, 3, 4]);
     }
 }
