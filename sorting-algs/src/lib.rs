@@ -19,8 +19,7 @@ pub trait Sorting {
 
     fn merge_sort(arr: &mut Vec<Self::Item>) {
         let size = arr.len();
-        if size == 2 {
-            if arr[0] > arr[1] { arr.swap(1, 0); }
+        if size < 2 {
             return
         }
 
